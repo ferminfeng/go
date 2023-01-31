@@ -9,11 +9,16 @@ func Newsplit(str, sep string) (des []string) {
 	index := strings.Index(str, sep)
 	for index > -1 {
 		sectionBefor := str[:index]
-		des = append(des, sectionBefor)
-		str = str[index+1:]
+		if len(sectionBefor) >= 1 {
+			des = append(des, sectionBefor)
+		}
+		str = str[index+len(sep):]
 		index = strings.Index(str, sep)
 	}
 	//最后1
-	des = append(des, str)
+	if len(str) >= 1 {
+		des = append(des, str)
+	}
+
 	return
 }
