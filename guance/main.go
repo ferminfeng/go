@@ -1,42 +1,37 @@
 package main
 
 import (
-	"gopkg.in/DataDog/dd-trace-go.v1/ddtrace/tracer"
-
 	"gopkg.in/DataDog/dd-trace-go.v1/ddtrace/ext"
-	"gopkg.in/DataDog/dd-trace-go.v1/profiler"
+	"gopkg.in/DataDog/dd-trace-go.v1/ddtrace/tracer"
 	"io/ioutil"
-	"log"
 	"net/http"
-	_ "net/http/pprof"
+	//_ "net/http/pprof"
 	"os"
-	"runtime"
-	"time"
 )
 
 func main() {
 
-	err := profiler.Start(
-		profiler.WithService("fermin-service-profiler"),
-		profiler.WithEnv("test"),
-		profiler.WithVersion("dd-1.0.0"),
-		profiler.WithTags("k:1", "k:2"),
-		profiler.WithAgentAddr("localhost:9529"), // DataKit url
-		profiler.WithProfileTypes(
-			profiler.CPUProfile,
-			profiler.HeapProfile,
-			// The profiles below are disabled by default to keep overhead
-			// low, but can be enabled as needed.
-
-			// profiler.BlockProfile,
-			// profiler.MutexProfile,
-			// profiler.GoroutineProfile,
-		),
-	)
-
-	if err != nil {
-		log.Fatal(err)
-	}
+	//err := profiler.Start(
+	//	profiler.WithService("fermin-service-profiler"),
+	//	profiler.WithEnv("test"),
+	//	profiler.WithVersion("dd-1.0.0"),
+	//	profiler.WithTags("k:1", "k:2"),
+	//	profiler.WithAgentAddr("localhost:9529"), // DataKit url
+	//	profiler.WithProfileTypes(
+	//		profiler.CPUProfile,
+	//		profiler.HeapProfile,
+	//		// The profiles below are disabled by default to keep overhead
+	//		// low, but can be enabled as needed.
+	//
+	//		// profiler.BlockProfile,
+	//		// profiler.MutexProfile,
+	//		// profiler.GoroutineProfile,
+	//	),
+	//)
+	//
+	//if err != nil {
+	//	log.Fatal(err)
+	//}
 
 	tracer.Start(
 		tracer.WithEnv("test"),
@@ -46,12 +41,12 @@ func main() {
 		tracer.WithAgentAddr("localhost:9529"), // DataKit url
 	)
 
-	tick := time.NewTicker(time.Second)
+	//tick := time.NewTicker(time.Second)
 
 	defer func() {
-		profiler.Stop()
+		//profiler.Stop()
 		tracer.Stop()
-		tick.Stop()
+		//tick.Stop()
 	}()
 
 	// your-app-main-entry...
@@ -64,16 +59,11 @@ func main() {
 	//	}
 	//}
 
-	// 开启 mutex 和 block 性能采集
+	// 性能采集
+	//var rate = 1
+	//runtime.SetMutexProfileFraction(rate)
+	//runtime.SetBlockProfileRate(rate)
 
-	// 设置采集频率，即 1/rate 的事件被采集， 如设置为 0 或小于 0 的数值，是不进行采集的
-	var rate = 1
-
-	// enable mutex profiling
-	runtime.SetMutexProfileFraction(rate)
-
-	// enable block profiling
-	runtime.SetBlockProfileRate(rate)
 	http.ListenAndServe(":6060", nil)
 
 }

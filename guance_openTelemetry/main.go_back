@@ -27,20 +27,129 @@ func main() {
 	shutdown := initOpenTelemetry()
 	defer func() {
 		shutdown()
+		//profiler.Stop()
+		//ddtracer.Stop()
 	}()
 
 	log.Println("connect ...")
 
+	// 性能采集
+	//profile()
+
+	// ddtrace
+	//DDTrace()
+
 	http.HandleFunc("/user", web)
+	//http.HandleFunc("/DDTraceRunApp", DDTraceRunApp)
+	//http.HandleFunc("/DDTraceRunAppWithError", DDTraceRunAppWithError)
 
 	err := http.ListenAndServe(":14317", nil)
 	if err != nil {
 		fmt.Println(fmt.Sprintf("服务启动失败: %v", err))
 	}
 
+	// 引入 _ "net/http/pprof"
+	// http://127.0.0.1:14317/debug/pprof/heap?debug=1
+
 	time.Sleep(time.Minute * 2)
 	os.Exit(0)
 }
+
+// 性能采集
+//func profile() {
+//
+//	log.Println("性能采集 start ...")
+//
+//	// push 方式
+//	err := profiler.Start(
+//		profiler.WithService("fermin-service-profiler"),
+//		profiler.WithEnv("test"),
+//		profiler.WithVersion("dd-1.0.0"),
+//		profiler.WithTags("k:1", "k:2"),
+//		profiler.WithAgentAddr("localhost:9529"), // DataKit url
+//		profiler.WithProfileTypes(
+//			profiler.CPUProfile,
+//			profiler.HeapProfile,
+//			// The profiles below are disabled by default to keep overhead
+//			// low, but can be enabled as needed.
+//
+//			// profiler.BlockProfile,
+//			// profiler.MutexProfile,
+//			// profiler.GoroutineProfile,
+//		),
+//	)
+//
+//	if err != nil {
+//		fmt.Println(fmt.Sprintf("性能采集 : %v", err))
+//	}
+//
+//	// 开启 mutex 和 block 性能采集 设置采集频率，即 1/rate 的事件被采集， 如设置为 0 或小于 0 的数值，是不进行采集的
+//	var rate = 1
+//	runtime.SetMutexProfileFraction(rate)
+//	runtime.SetBlockProfileRate(rate)
+//
+//	log.Println("性能采集 end ...")
+//}
+
+//func DDTrace() {
+//
+//	ddtracer.Start(
+//		ddtracer.WithEnv("local"),
+//		ddtracer.WithService("fermin_service_ddtrace"),
+//		//ddtracer.WithServiceVersion("1.2.3"),
+//		//ddtracer.WithGlobalTag("project", "fermin- add-ddtrace-in-golang-project"),
+//		ddtracer.WithAgentAddr("localhost:9529"), // DataKit url
+//	)
+//}
+
+//func DDTraceRunApp(w http.ResponseWriter, r *http.Request) {
+//	var err error
+//
+//	// Start a root span.
+//	span := ddtracer.StartSpan("get.data")
+//	defer span.Finish(ddtracer.WithError(err))
+//
+//	child := ddtracer.StartSpan("read.file", ddtracer.ChildOf(span.Context()))
+//	child.SetTag(ext.ResourceName, os.Args[0])
+//
+//	var bts []byte
+//	bts, err = ioutil.ReadFile(os.Args[0])
+//	span.SetTag("file_len", len(bts))
+//	child.Finish(ddtracer.WithError(err))
+//
+//	log.Printf("DDTraceRunApp Done!")
+//	w.Write([]byte("DDTraceRunApp ok"))
+//}
+
+//func DDTraceRunAppWithError(w http.ResponseWriter, r *http.Request) {
+//	var err error
+//
+//	span := ddtracer.StartSpan("init_data")
+//	fmt.Println("span.Context() : ", span.Context())
+//
+//	child := ddtracer.StartSpan("first_data", ddtracer.ChildOf(span.Context()))
+//	//child.SetTag(ext.ResourceName, "somefile-not-found.go")
+//	time.Sleep(2 * time.Second)
+//	child.Finish()
+//	fmt.Println("child.Context() : ", child.Context())
+//
+//	child2 := ddtracer.StartSpan("two_data", ddtracer.ChildOf(child.Context()))
+//	//child2.SetTag(ext.ResourceName, "somefile-not-found.go")
+//	time.Sleep(1 * time.Second)
+//	child2.Finish()
+//	fmt.Println("child2.Context() : ", child2.Context())
+//
+//	defer func() {
+//		span.Finish(ddtracer.WithError(err))
+//	}()
+//
+//	if _, err = ioutil.ReadFile("somefile-not-found.go"); err != nil {
+//		// error handle
+//	}
+//
+//	log.Printf("DDTraceRunAppWithError Done!")
+//	w.Write([]byte("DDTraceRunAppWithError ok"))
+//}
 
 // 初始化链路追踪
 func initOpenTelemetry() func() {
@@ -96,11 +205,12 @@ var tracer = otel.Tracer("tracer_user_login")
 // web handler 处理请求数据
 func web(w http.ResponseWriter, r *http.Request) {
 	_, spanA := InitBuryingPoint("demo-error-first")
-	spanA.SetStatus(codes.Error, "span-first is error")
 	spanA.End()
+	spanA.SetStatus(codes.Error, "span-first is error")
 
 	ctx, span := InitBuryingPoint("demo-first")
-	span.SetStatus(codes.Error, "span-first is ok")
+
+	//span.SetStatus(codes.Ok, "span-first is ok")
 
 	defer span.End()
 
