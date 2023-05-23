@@ -24,6 +24,7 @@ import (
 )
 
 func main() {
+
 	shutdown := initOpenTelemetry()
 	defer func() {
 		shutdown()
@@ -185,6 +186,7 @@ func FinishBuryingPoint(dataKitSpan trace.Span, res bool) {
 
 	dataKitSpan.End()
 
+	dataKitSpan.SetAttributes(attribute.String("http_response_content", "哈哈哈哈哈"))
 	if res {
 		dataKitSpan.SetStatus(codes.Ok, "is ok")
 	} else {
