@@ -25,7 +25,7 @@ func postForm2() {
 
 	client := &http.Client{}
 	r, _ := http.NewRequest("POST", urlStr, bodyData)
-	r.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	//r.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	r.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Safari/537.36")
 	res, err := client.Do(r)
 	if err != nil {
