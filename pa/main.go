@@ -14,19 +14,16 @@ func main() {
 
 // 以Do的方式发送body为键值对的post请求
 func postForm2() {
-	uri := "https://wyobiz.wyo.gov/Business/FilingSearch.aspx"
-	//resource := "/test"
 	data := urlValues()
-	u, _ := url.ParseRequestURI(uri)
-	//u.Path = resource
-	urlStr := u.String()
+	urlStr := "https://wyobiz.wyo.gov/Business/FilingSearch.aspx"
+
 	client := &http.Client{}
 	r, _ := http.NewRequest("POST", urlStr, strings.NewReader(data.Encode()))
-	r.Header.Add("Content-Type", "application/x-www-form-urlencoded")
-	r.Header.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Safari/537.36")
+	r.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	r.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Safari/537.36")
 	res, err := client.Do(r)
 	if err != nil {
-		fmt.Println(err.Error())
+		fmt.Println("err：  ", err.Error())
 		return
 	}
 
