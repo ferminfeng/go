@@ -15,12 +15,27 @@ import (
 var debug = false
 var companyName string
 
+func saveLog(fileName, s string) {
+	// 创建一个文件变量
+	file, err := os.OpenFile(fileName, os.O_CREATE|os.O_WRONLY, 0)
+	if err != nil {
+		fmt.Println("打开文件失败")
+		return
+	}
+	fmt.Fprintf(file, s) // 向file对应文件中写入数据
+	file.Close()
+}
+
 func main() {
 
 	fmt.Printf("请输入公司名称，如公司名称存在多个单词请用单引号包住公司名称: ")
-	fmt.Scanln(&companyName)
+	_, err := fmt.Scanln(&companyName)
+	if err != nil {
+		fmt.Println("未输入数据")
+		return
+	}
 	//companyName := "Super voyage inc"
-	postForm2(companyName)
+	searchData(companyName)
 
 	i := 0
 	for {
@@ -28,8 +43,8 @@ func main() {
 	}
 }
 
-// 以Do的方式发送body为键值对的post请求
-func postForm2(companyName string) {
+// 搜索公司
+func searchData(companyName string) {
 	data := urlValues(companyName)
 	bodyData := strings.NewReader(data.Encode())
 
@@ -109,7 +124,7 @@ func postForm2(companyName string) {
 
 	str := string(body)
 
-	regData(str)
+	regSearchData(str)
 }
 
 func urlValues(companyName string) url.Values {
@@ -131,18 +146,7 @@ func urlValues(companyName string) url.Values {
 	return data2
 }
 
-func saveLog(fileName, s string) {
-	// 创建一个文件变量
-	file, err := os.OpenFile(fileName, os.O_CREATE|os.O_WRONLY, 0)
-	if err != nil {
-		fmt.Println("打开文件失败")
-		return
-	}
-	fmt.Fprintf(file, s) // 向file对应文件中写入数据
-	file.Close()
-}
-
-func regData(str string) {
+func regSearchData(str string) {
 	compileRegex := regexp.MustCompile(`<li class="rowRegular">(?s:(.*?))</li>`)
 	matchArr := compileRegex.FindAllStringSubmatch(str, -1)
 
@@ -152,7 +156,7 @@ func regData(str string) {
 
 	outData := ""
 
-	fmt.Println("已搜索到数据，仅输出第一页数据\n")
+	fmt.Println(fmt.Sprintf("已搜索到数据，仅输出第一页数据\n"))
 
 	for _, match := range matchArr {
 		content := match[1]
@@ -179,13 +183,14 @@ func regData(str string) {
 
 	//nowTime := time.Now()
 	//fileName := fmt.Sprintf("result_%d%d%d_%d%d%d.log", nowTime.Year(), nowTime.Month(), nowTime.Day(), nowTime.Hour(), nowTime.Minute(), nowTime.Second())
-	//saveLog(fileName, outData)
+	fileName := fmt.Sprintf("result_%s.log", Stamp2Str(time.Now().Unix()))
+	saveLog(fileName, outData)
 
 	return
 }
 
 func Stamp2Str(stamp int64) string {
-	timeLayout := "2006-01-02 15:04:05"
+	timeLayout := "2006-01-02 15-04-05"
 	str := time.Unix(stamp, 0).Format(timeLayout)
 	return str
 }
