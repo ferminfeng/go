@@ -1,3 +1,4 @@
+// 同步请求
 package main
 
 import (
