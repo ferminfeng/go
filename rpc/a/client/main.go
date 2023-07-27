@@ -7,6 +7,7 @@ import (
 )
 
 func main() {
+
 	client, err := rpc.Dial("tcp", "localhost:9999")
 	if err != nil {
 		log.Fatal("dialing:", err)
