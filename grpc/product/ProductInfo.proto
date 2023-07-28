@@ -1,8 +1,8 @@
 syntax = "proto3";
 package product;
 
-//option go_package = "/product";
-option go_package = "testGo/grpc/product";
+// 进入当前文件的父级目录 执行命令  protoc --go_out=plugins=grpc:. product/ProductInfo.proto
+option go_package = "/product";
 
 service ProductInfo {
   //添加商品
