@@ -19,6 +19,22 @@ type server struct {
 	productMap map[string]*product.Product
 }
 
+func main() {
+	listener, err := net.Listen("tcp", port)
+	if err != nil {
+		log.Println("net listen err ", err)
+		return
+	}
+
+	s := grpc.NewServer()
+	product.RegisterProductInfoServer(s, &server{})
+	log.Println("start gRPC listen on port " + port)
+	if err := s.Serve(listener); err != nil {
+		log.Println("failed to serve...", err)
+		return
+	}
+}
+
 // AddProduct 添加商品
 func (s *server) AddProduct(ctx context.Context, req *product.Product) (resp *product.ProductId, err error) {
 	resp = &product.ProductId{}
@@ -45,22 +61,4 @@ func (s *server) GetProduct(ctx context.Context, req *product.ProductId) (resp *
 
 	resp = s.productMap[req.Value]
 	return
-}
-
-func main() {
-	port := ":50051"
-
-	listener, err := net.Listen("tcp", port)
-	if err != nil {
-		log.Println("net listen err ", err)
-		return
-	}
-
-	s := grpc.NewServer()
-	product.RegisterProductInfoServer(s, &server{})
-	log.Println("start gRPC listen on port " + port)
-	if err := s.Serve(listener); err != nil {
-		log.Println("failed to serve...", err)
-		return
-	}
 }

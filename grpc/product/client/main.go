@@ -23,12 +23,16 @@ func main() {
 	ctx := context.Background()
 
 	id := AddProduct(ctx, client)
+
 	GetProduct(ctx, client, id)
 }
 
 // AddProduct 添加一个测试的商品
 func AddProduct(ctx context.Context, client product.ProductInfoClient) (id string) {
-	aMac := &product.Product{Name: "Mac Book Pro 2019", Description: "From Apple Inc."}
+	aMac := &product.Product{
+		Name:        "Mac Book Pro 2019",
+		Description: "From Apple Inc.",
+	}
 	productId, err := client.AddProduct(ctx, aMac)
 	if err != nil {
 		log.Println("add product fail.", err)
