@@ -36,18 +36,6 @@ func main() {
 	}
 }
 
-// GetOrder 获取订单
-func (s *server) GetOrder(ctx context.Context, req *wrappers.StringValue) (resp *order.Order, err error) {
-	resp = &order.Order{}
-	id := req.Value
-	var exist bool
-	if resp, exist = s.orderMap[id]; !exist {
-		err = status.Error(codes.NotFound, "order not found id = "+id)
-		return
-	}
-	return
-}
-
 // AddOrder 添加订单
 func (s *server) AddOrder(ctx context.Context, req *order.Order) (resp *wrappers.StringValue, err error) {
 	resp = &wrappers.StringValue{}
@@ -63,6 +51,18 @@ func (s *server) AddOrder(ctx context.Context, req *order.Order) (resp *wrappers
 	req.Id = id
 	s.orderMap[id] = req
 	resp.Value = id
+	return
+}
+
+// GetOrder 获取订单
+func (s *server) GetOrder(ctx context.Context, req *wrappers.StringValue) (resp *order.Order, err error) {
+	resp = &order.Order{}
+	id := req.Value
+	var exist bool
+	if resp, exist = s.orderMap[id]; !exist {
+		err = status.Error(codes.NotFound, "order not found id = "+id)
+		return
+	}
 	return
 }
 
