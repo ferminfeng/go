@@ -12,6 +12,7 @@ import (
 	"net"
 	"strings"
 	"testGo/grpc/order"
+	"time"
 )
 
 const port = ":50052"
@@ -27,7 +28,14 @@ func main() {
 		return
 	}
 
-	s := grpc.NewServer()
+	// s := grpc.NewServer()
+
+	// 注册拦截器
+	s := grpc.NewServer(
+		grpc.UnaryInterceptor(orderUnaryServerInterceptor),
+		grpc.StreamInterceptor(orderStreamServerInterceptor),
+	)
+
 	order.RegisterOrderManagementServer(s, &server{})
 	log.Println("start gRPC listen on port " + port)
 	if err := s.Serve(listener); err != nil {
@@ -43,6 +51,8 @@ func (s *server) AddOrder(ctx context.Context, req *order.Order) (resp *wrappers
 		s.orderMap = make(map[string]*order.Order)
 	}
 
+	time.Sleep(3 * time.Second)
+
 	v4, err := uuid.NewV4()
 	if err != nil {
 		return resp, status.Errorf(codes.Internal, "gen uuid err", err)
@@ -56,6 +66,7 @@ func (s *server) AddOrder(ctx context.Context, req *order.Order) (resp *wrappers
 
 // GetOrder 获取订单
 func (s *server) GetOrder(ctx context.Context, req *wrappers.StringValue) (resp *order.Order, err error) {
+
 	resp = &order.Order{}
 	id := req.Value
 	var exist bool
@@ -88,8 +99,8 @@ func (s *server) UpdateOrder(stream order.OrderManagement_UpdateOrderServer) (er
 	updatedIds := "updated order ids : "
 	for {
 		val, err := stream.Recv()
-		if err == io.EOF { //完成读取订单流
-			//向客户端发送消息
+		if err == io.EOF { // 完成读取订单流
+			// 向客户端发送消息
 			return stream.SendAndClose(&wrappers.StringValue{Value: updatedIds})
 		}
 		s.orderMap[val.Id] = val
@@ -121,6 +132,11 @@ func (s *server) ProcessOrder(stream order.OrderManagement_ProcessOrderServer) (
 			orderId := val.Value
 			log.Printf("[server]reading order : %+v\n", orderId)
 
+			if _, exist := s.orderMap[orderId]; !exist {
+				log.Printf("[server]订单不存在 : %+v\n", orderId)
+				continue
+			}
+
 			dest := s.orderMap[orderId].Destination
 			shipment, exist := combinedShipmentMap[dest]
 			if exist {
@@ -137,4 +153,51 @@ func (s *server) ProcessOrder(stream order.OrderManagement_ProcessOrderServer) (
 		}
 	}
 	return
+}
+
+// 一元拦截器
+func orderUnaryServerInterceptor(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (res interface{}, err error) {
+	// 前置处理
+	log.Println("==========[服务端一元拦截器] start ===========", info.FullMethod)
+
+	// 完成方法的正常执行
+	res, err = handler(ctx, req)
+
+	// 后置处理
+	log.Printf("After method call, res = %+v\n", res)
+	log.Println("==========[服务端一元拦截器] end ===========\n\n", info.FullMethod)
+
+	return
+}
+
+// WrappedServerStream 服务端流拦截器
+type WrappedServerStream struct {
+	grpc.ServerStream
+}
+
+func (w *WrappedServerStream) SendMsg(m interface{}) error {
+	log.Printf("[order stream server interceptor] send a msg : %+v", m)
+	return w.ServerStream.SendMsg(m)
+}
+
+func (w *WrappedServerStream) RecvMsg(m interface{}) error {
+	log.Printf("[order stream server interceptor] recv a msg : %+v", m)
+	return w.ServerStream.RecvMsg(m)
+}
+
+func NewWrappedServerStream(s grpc.ServerStream) *WrappedServerStream {
+	return &WrappedServerStream{s}
+}
+
+func orderStreamServerInterceptor(srv interface{}, ss grpc.ServerStream, info *grpc.StreamServerInfo, handler grpc.StreamHandler) error {
+	log.Printf("=========[服务端流拦截器]start %s ========= \n", info.FullMethod)
+
+	// 执行方法
+	err := handler(srv, NewWrappedServerStream(ss))
+	if err != nil {
+		log.Println("handle method err.", err)
+	}
+
+	log.Printf("=========[服务端流拦截器]end=========\n\n")
+	return nil
 }
