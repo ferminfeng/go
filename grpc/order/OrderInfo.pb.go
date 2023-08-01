@@ -214,8 +214,14 @@ var file_order_OrderInfo_proto_rawDesc = []byte{
 	0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66,
 	0x2e, 0x53, 0x74, 0x72, 0x69, 0x6e, 0x67, 0x56, 0x61, 0x6c, 0x75, 0x65, 0x1a, 0x17, 0x2e, 0x6f,
 	0x72, 0x64, 0x65, 0x72, 0x2e, 0x43, 0x6f, 0x6d, 0x62, 0x69, 0x6e, 0x65, 0x64, 0x53, 0x68, 0x69,
-	0x70, 0x6d, 0x65, 0x6e, 0x74, 0x28, 0x01, 0x30, 0x01, 0x42, 0x08, 0x5a, 0x06, 0x2f, 0x6f, 0x72,
-	0x64, 0x65, 0x72, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x70, 0x6d, 0x65, 0x6e, 0x74, 0x28, 0x01, 0x30, 0x01, 0x32, 0x58, 0x0a, 0x0e, 0x47, 0x72, 0x65,
+	0x65, 0x74, 0x65, 0x72, 0x53, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x12, 0x46, 0x0a, 0x08, 0x73,
+	0x61, 0x79, 0x48, 0x65, 0x6c, 0x6c, 0x6f, 0x12, 0x1c, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65,
+	0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x53, 0x74, 0x72, 0x69, 0x6e, 0x67,
+	0x56, 0x61, 0x6c, 0x75, 0x65, 0x1a, 0x1c, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70,
+	0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x53, 0x74, 0x72, 0x69, 0x6e, 0x67, 0x56, 0x61,
+	0x6c, 0x75, 0x65, 0x42, 0x08, 0x5a, 0x06, 0x2f, 0x6f, 0x72, 0x64, 0x65, 0x72, 0x62, 0x06, 0x70,
+	0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -243,13 +249,15 @@ var file_order_OrderInfo_proto_depIdxs = []int32{
 	2, // 3: order.OrderManagement.searchOrder:input_type -> google.protobuf.StringValue
 	0, // 4: order.OrderManagement.updateOrder:input_type -> order.Order
 	2, // 5: order.OrderManagement.processOrder:input_type -> google.protobuf.StringValue
-	0, // 6: order.OrderManagement.getOrder:output_type -> order.Order
-	2, // 7: order.OrderManagement.addOrder:output_type -> google.protobuf.StringValue
-	0, // 8: order.OrderManagement.searchOrder:output_type -> order.Order
-	2, // 9: order.OrderManagement.updateOrder:output_type -> google.protobuf.StringValue
-	1, // 10: order.OrderManagement.processOrder:output_type -> order.CombinedShipment
-	6, // [6:11] is the sub-list for method output_type
-	1, // [1:6] is the sub-list for method input_type
+	2, // 6: order.GreeterService.sayHello:input_type -> google.protobuf.StringValue
+	0, // 7: order.OrderManagement.getOrder:output_type -> order.Order
+	2, // 8: order.OrderManagement.addOrder:output_type -> google.protobuf.StringValue
+	0, // 9: order.OrderManagement.searchOrder:output_type -> order.Order
+	2, // 10: order.OrderManagement.updateOrder:output_type -> google.protobuf.StringValue
+	1, // 11: order.OrderManagement.processOrder:output_type -> order.CombinedShipment
+	2, // 12: order.GreeterService.sayHello:output_type -> google.protobuf.StringValue
+	7, // [7:13] is the sub-list for method output_type
+	1, // [1:7] is the sub-list for method input_type
 	1, // [1:1] is the sub-list for extension type_name
 	1, // [1:1] is the sub-list for extension extendee
 	0, // [0:1] is the sub-list for field type_name
@@ -294,7 +302,7 @@ func file_order_OrderInfo_proto_init() {
 			NumEnums:      0,
 			NumMessages:   2,
 			NumExtensions: 0,
-			NumServices:   1,
+			NumServices:   2,
 		},
 		GoTypes:           file_order_OrderInfo_proto_goTypes,
 		DependencyIndexes: file_order_OrderInfo_proto_depIdxs,
@@ -631,5 +639,77 @@ var _OrderManagement_serviceDesc = grpc.ServiceDesc{
 			ClientStreams: true,
 		},
 	},
+	Metadata: "order/OrderInfo.proto",
+}
+
+// GreeterServiceClient is the client API for GreeterService service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
+type GreeterServiceClient interface {
+	SayHello(ctx context.Context, in *wrapperspb.StringValue, opts ...grpc.CallOption) (*wrapperspb.StringValue, error)
+}
+
+type greeterServiceClient struct {
+	cc grpc.ClientConnInterface
+}
+
+func NewGreeterServiceClient(cc grpc.ClientConnInterface) GreeterServiceClient {
+	return &greeterServiceClient{cc}
+}
+
+func (c *greeterServiceClient) SayHello(ctx context.Context, in *wrapperspb.StringValue, opts ...grpc.CallOption) (*wrapperspb.StringValue, error) {
+	out := new(wrapperspb.StringValue)
+	err := c.cc.Invoke(ctx, "/order.GreeterService/sayHello", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// GreeterServiceServer is the server API for GreeterService service.
+type GreeterServiceServer interface {
+	SayHello(context.Context, *wrapperspb.StringValue) (*wrapperspb.StringValue, error)
+}
+
+// UnimplementedGreeterServiceServer can be embedded to have forward compatible implementations.
+type UnimplementedGreeterServiceServer struct {
+}
+
+func (*UnimplementedGreeterServiceServer) SayHello(context.Context, *wrapperspb.StringValue) (*wrapperspb.StringValue, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SayHello not implemented")
+}
+
+func RegisterGreeterServiceServer(s *grpc.Server, srv GreeterServiceServer) {
+	s.RegisterService(&_GreeterService_serviceDesc, srv)
+}
+
+func _GreeterService_SayHello_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(wrapperspb.StringValue)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GreeterServiceServer).SayHello(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/order.GreeterService/SayHello",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GreeterServiceServer).SayHello(ctx, req.(*wrapperspb.StringValue))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+var _GreeterService_serviceDesc = grpc.ServiceDesc{
+	ServiceName: "order.GreeterService",
+	HandlerType: (*GreeterServiceServer)(nil),
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "sayHello",
+			Handler:    _GreeterService_SayHello_Handler,
+		},
+	},
+	Streams:  []grpc.StreamDesc{},
 	Metadata: "order/OrderInfo.proto",
 }

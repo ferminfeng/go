@@ -6,6 +6,7 @@ import "google/protobuf/wrappers.proto";
 // 进入当前文件的父级目录 执行命令  protoc --go_out=plugins=grpc:. order/OrderInfo.proto
 option go_package = "/order";
 
+// 订单管理
 service OrderManagement {
   // 获取订单
   rpc getOrder(google.protobuf.StringValue) returns(Order);
@@ -47,4 +48,9 @@ message CombinedShipment {
   string status = 2;
 
   repeated Order orderList = 3;
+}
+
+// 问候服务
+service GreeterService {
+  rpc sayHello(google.protobuf.StringValue) returns (google.protobuf.StringValue);
 }

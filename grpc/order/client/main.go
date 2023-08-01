@@ -34,7 +34,7 @@ func main() {
 		}
 	}(conn)
 
-	// ctx := context.Background()
+	ctx := context.Background()
 	//
 	// // 使用带有截止时间的context
 	// ctx, cancel := context.WithDeadline(
@@ -46,17 +46,24 @@ func main() {
 
 	client := order.NewOrderManagementClient(conn)
 
+	// 问候服务客户端
+	greeterClient := order.NewGreeterServiceClient(conn)
+	_, err = greeterClient.SayHello(ctx, &wrappers.StringValue{Value: "roseduan"})
+	if err != nil {
+		log.Println("call greeter server [say hello] err.", err)
+	}
+
 	fmt.Println("-----------unary rpc-------------")
 
 	// 取消RPC请求
-	cancelRpcRequest(client)
+	// cancelRpcRequest(client)
 
-	// // 添加订单
-	// id := AddOrder(ctx, client)
-	//
-	// // 获取订单
-	// GetOrder(ctx, client, id)
-	//
+	// 添加订单
+	id := AddOrder(ctx, client)
+
+	// 获取订单
+	GetOrder(ctx, client, id)
+
 	// // 搜索订单
 	// // SearchOrder(ctx, client)
 	//
