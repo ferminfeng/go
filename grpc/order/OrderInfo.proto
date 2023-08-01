@@ -3,7 +3,10 @@ package order;
 
 import "google/protobuf/wrappers.proto";
 
-// 进入当前文件的父级目录 执行命令  protoc --go_out=plugins=grpc:. order/OrderInfo.proto
+// 进入当前文件的父级目录 执行命令
+// protoc --go_out=plugins=grpc:. order/OrderInfo.proto
+// 或者在项目根目录执行 【./grpc/】代表把文件生成在哪里 【grpc/order/OrderInfo.proto】声名proto文件所在位置
+// protoc --go_out=plugins=grpc:./grpc/ grpc/order/OrderInfo.proto
 option go_package = "/order";
 
 // 订单管理
