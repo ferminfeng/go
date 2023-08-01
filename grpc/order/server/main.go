@@ -5,13 +5,31 @@ import (
 	"google.golang.org/grpc"
 	"log"
 	"net"
+	"sync"
 	"testGo/grpc/order"
 )
 
-const port = ":50052"
+// const addr = ":50052"
+var addrList = []string{":50052", ":50053", ":50054"}
 
 func main() {
-	listener, err := net.Listen("tcp", port)
+
+	var wg sync.WaitGroup
+	for _, addr := range addrList {
+		wg.Add(1)
+
+		go func(val string) {
+			defer wg.Done()
+			startServer(val)
+		}(addr)
+	}
+
+	wg.Wait()
+}
+
+// 启动服务
+func startServer(addr string) {
+	listener, err := net.Listen("tcp", addr)
 	if err != nil {
 		log.Println("net listen err ", err)
 		return
@@ -33,7 +51,7 @@ func main() {
 	// 注册问候服务
 	order.RegisterGreeterServiceServer(s, &GreeterServer{})
 
-	log.Println("start gRPC listen on port " + port)
+	log.Println("start gRPC listen on port " + addr)
 	if err := s.Serve(listener); err != nil {
 		log.Println("failed to serve...", err)
 		return

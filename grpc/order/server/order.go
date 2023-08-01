@@ -3,13 +3,16 @@ package main
 import (
 	"context"
 	"github.com/gofrs/uuid"
+	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
 	wrappers "google.golang.org/protobuf/types/known/wrapperspb"
 	"io"
 	"log"
 	"strings"
 	"testGo/grpc/order"
+	"time"
 )
 
 type OrderServer struct {
@@ -27,6 +30,21 @@ func InitSampleData(orderMap map[string]*order.Order) {
 
 // AddOrder 添加订单
 func (s *OrderServer) AddOrder(ctx context.Context, req *order.Order) (resp *wrappers.StringValue, err error) {
+
+	// 发送服务端元数据
+	md := metadata.New(map[string]string{"location": "San Jose", "timestamp": time.Now().Format(time.StampNano)})
+	err = grpc.SendHeader(ctx, md)
+	if err != nil {
+		log.Println("send header err")
+	}
+
+	// 获取客户端元数据
+	if md, ok := metadata.FromIncomingContext(ctx); !ok {
+		log.Println("failed to get metadata")
+	} else {
+		log.Printf("来自客户端的元数据 : %+v\n", md)
+	}
+
 	resp = &wrappers.StringValue{}
 	if s.orderMap == nil {
 		s.orderMap = make(map[string]*order.Order)

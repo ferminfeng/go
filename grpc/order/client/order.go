@@ -3,6 +3,8 @@ package main
 import (
 	"context"
 	"fmt"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/metadata"
 	wrappers "google.golang.org/protobuf/types/known/wrapperspb"
 	"io"
 	"log"
@@ -20,13 +22,17 @@ func AddOrder(ctx context.Context, client order.OrderManagementClient) string {
 		Destination: "Shanghai",
 		Items:       []string{"doll", "22", "33", "Apple"},
 	}
+	// 接收从服务端发送过来的metadata信息
+	var header metadata.MD
 
-	val, err := client.AddOrder(ctx, odr)
+	val, err := client.AddOrder(ctx, odr, grpc.Header(&header))
 	if err != nil {
 		log.Println("add order fail.", err)
 		return ""
 	}
 	log.Println("add order success.id = ", val.String())
+
+	log.Printf("接受服务端元数据 : %+v\n", header)
 
 	fmt.Println("")
 	return val.Value
