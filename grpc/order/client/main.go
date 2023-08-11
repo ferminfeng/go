@@ -40,6 +40,31 @@ func main() {
 
 	ctx := context.Background()
 
+	// reqData := []byte(`{"id":"asas","items":["11111"],"description":"111aaaa","price":11222.12,"destination":"asdasdas"}`)
+
+	// reqData, err := proto.Marshal(&order.Order{
+	// 	Id:          "123456",
+	// 	Items:       []string{"商品1", "商品e"},
+	// 	Description: "我是描述",
+	// 	Price:       1111.23,
+	// 	Destination: "",
+	// })
+	// if err != nil {
+	// 	fmt.Println(err)
+	// 	return
+	// }
+	// fmt.Println("reqData: ", string(reqData))
+	// fmt.Println("reqData: ", reqData)
+	//
+	// oData := order.Order{}
+	// err = proto.Unmarshal(reqData, &oData)
+	// if err != nil {
+	// 	log.Println("reqData sss  err：", err.Error())
+	// 	return
+	// }
+	// fmt.Println("oData: ", oData)
+	// return
+
 	// // 使用带有截止时间的context
 	// ctx, cancel := context.WithDeadline(
 	// 	context.Background(),
