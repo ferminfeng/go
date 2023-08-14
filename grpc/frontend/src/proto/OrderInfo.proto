@@ -1,0 +1,59 @@
+syntax = "proto3";
+package order;
+
+import "google/protobuf/wrappers.proto";
+
+// 进入当前文件的父级目录 执行命令
+// protoc --go_out=plugins=grpc:. order/OrderInfo.proto
+// 或者在项目根目录执行 【./grpc/】代表把文件生成在哪里 【grpc/order/OrderInfo.proto】声名proto文件所在位置
+// protoc --go_out=plugins=grpc:./grpc/ grpc/order/OrderInfo.proto
+//option go_package = "/order";
+
+// 订单管理
+service OrderManagement {
+  // 获取订单
+  rpc getOrder(google.protobuf.StringValue) returns(Order);
+
+  // 添加订单
+  rpc addOrder(Order) returns(google.protobuf.StringValue);
+
+  // 搜索订单
+  rpc searchOrder(google.protobuf.StringValue) returns(stream Order);
+
+  // 更新订单
+  rpc updateOrder(stream Order) returns(google.protobuf.StringValue);
+
+  // 处理订单
+  rpc processOrder(stream google.protobuf.StringValue) returns(stream CombinedShipment);
+
+}
+
+message Order {
+  // 订单id
+  string id = 1;
+
+  // 订单详情
+  repeated string items = 2;
+
+  // 订单描述
+  string description = 3;
+
+  // 订单价格
+  float price = 4;
+
+  // 订单目的地
+  string destination = 5;
+}
+
+message CombinedShipment {
+  string id = 1;
+
+  string status = 2;
+
+  repeated Order orderList = 3;
+}
+
+// 问候服务
+service GreeterService {
+  rpc sayHello(google.protobuf.StringValue) returns (google.protobuf.StringValue);
+}
