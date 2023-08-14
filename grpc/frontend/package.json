@@ -9,8 +9,12 @@
     "proto": "pbjs -t json-module -w commonjs -o --es5 src/proto/proto.js src/proto/*.proto"
   },
   "dependencies": {
+    "axios": "^0.18.1",
     "core-js": "^3.8.3",
-    "vue": "^3.2.13"
+    "protobufjs": "^7.2.4",
+    "vue": "^2.5.17",
+    "vue-router": "^3.0.1",
+    "vuex": "^3.0.1"
   },
   "devDependencies": {
     "@babel/core": "^7.12.16",
@@ -21,7 +25,10 @@
     "axios": "^1.4.0",
     "eslint": "^7.32.0",
     "eslint-plugin-vue": "^8.0.3",
-    "protobufjs": "^7.2.4"
+    "protobufjs": "^7.2.4",
+    "sass": "^1.65.1",
+    "sass-loader": "^13.3.2",
+    "webpack": "^5.88.2"
   },
   "eslintConfig": {
     "root": true,
@@ -35,7 +42,9 @@
     "parserOptions": {
       "parser": "@babel/eslint-parser"
     },
-    "rules": {}
+    "rules": {
+      "vue/multi-word-component-names": 0
+    }
   },
   "browserslist": [
     "> 1%",
