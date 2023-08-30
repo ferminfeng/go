@@ -81,7 +81,7 @@ function request(msgType, requestBody, responseType) {
   // 这里用到axios的配置项：transformRequest和transformResponse
   // transformRequest 发起请求时，调用transformRequest方法，目的是将req转换成二进制
   // transformResponse 对返回的数据进行处理，目的是将二进制转换成真正的json数据
-  return httpService.post('/api', req, {
+  return httpService.post('http://127.0.0.1:10002/user/account_check', req, {
     transformRequest,
     transformResponse: transformResponseFactory(responseType)
   }).then(({data, status}) => {

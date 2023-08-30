@@ -2,6 +2,9 @@ package main
 
 import (
 	"context"
+	"fmt"
+	"github.com/golang/protobuf/jsonpb"
+	_ "go.uber.org/automaxprocs"
 	"google.golang.org/grpc"
 	"log"
 	"net"
@@ -13,7 +16,7 @@ import (
 var addrList = []string{":50052", ":50053", ":50054"}
 
 func main() {
-
+	Test()
 	var wg sync.WaitGroup
 	for _, addr := range addrList {
 		wg.Add(1)
@@ -25,6 +28,16 @@ func main() {
 	}
 
 	wg.Wait()
+}
+
+func Test() {
+
+	jsonstr := `{"id":"1234","items":["aaaaa","bbbb"],"description":"描述","price":123.44,"destination":"订单目的地"}`
+	pb := &order.Order{}
+	if err := jsonpb.UnmarshalString(jsonstr, pb); err == nil {
+		fmt.Errorf("err:%s\n", err)
+	}
+	fmt.Printf("pb.say:%s\n", pb.Id)
 }
 
 // 启动服务
