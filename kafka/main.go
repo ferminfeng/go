@@ -10,7 +10,7 @@ import (
 var startType string
 
 var KafkaAddr = []string{"localhost:9093"}
-var TestTopicName = "Topic"
+var TestTopicName = "test_topic"
 
 func main() {
 	flag.StringVar(&startType, "s", "", "启动生产者还是消费者")
