@@ -4,7 +4,6 @@ go 1.20
 
 require (
 	github.com/gin-gonic/gin v1.7.7
-	github.com/jackdanger/collectlinks v0.0.0-20160421202702-24c4ee2870ba
 	github.com/nats-io/nats.go v1.23.0
 	github.com/robfig/cron v1.2.0
 	go.opentelemetry.io/otel v1.15.1
