@@ -9,6 +9,7 @@ import (
 	"os"
 	"os/signal"
 	"sync"
+	"time"
 )
 
 func MoreConsumer() {
@@ -41,8 +42,8 @@ func MoreConsumer() {
 
 	// 启动多个消费者goroutine
 	for i := 0; i < numConsumers; i++ {
-		fmt.Println("启动多个消费者：", i)
 		go func(i int) {
+			fmt.Println("启动多个消费者：", i)
 			defer wg.Done()
 			for {
 				// 每个goroutine都处理分配给它的分区
@@ -90,8 +91,10 @@ func (h *consumerGroupHandler) Cleanup(sess sarama.ConsumerGroupSession) error {
 // ConsumeClaim 当分区被分配给该成员时调用
 func (h *consumerGroupHandler) ConsumeClaim(sess sarama.ConsumerGroupSession, claim sarama.ConsumerGroupClaim) error {
 	for msg := range claim.Messages() {
-		fmt.Printf("Message claimed: memberID=%s, topic=%s, partition=%d, offset=%d, key=%s, value=%s\n", sess.MemberID(),
-			msg.Topic, msg.Partition, msg.Offset, msg.Key, msg.Value)
+		// fmt.Printf("Message claimed: memberID=%s, topic=%s, partition=%d, offset=%d, key=%s, value=%s\n", sess.MemberID(), msg.Topic, msg.Partition, msg.Offset, msg.Key, msg.Value)
+
+		fmt.Printf("memberID=%s, offset=%d, key=%s, value=%s\n", sess.MemberID(), msg.Offset, msg.Key, msg.Value)
+		time.Sleep(2 * time.Second)
 		sess.MarkMessage(msg, "")
 	}
 	return nil
