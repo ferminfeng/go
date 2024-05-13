@@ -5,6 +5,7 @@ go 1.21
 require (
 	github.com/IBM/sarama v1.43.2
 	github.com/gin-gonic/gin v1.10.0
+	github.com/go-zookeeper/zk v1.0.3
 	github.com/gofrs/uuid v4.4.0+incompatible
 	github.com/golang/protobuf v1.5.4
 	github.com/json-iterator/go v1.1.12
