@@ -1,5 +1,18 @@
 package main
 
+type NaCosConfigStruct struct {
+	IpAddr      string
+	Port        uint64
+	Username    string
+	Password    string
+	NamespaceId string // 命名空间ID
+	TimeoutMs   uint64 // 请求NaCos服务器的超时时间，默认值为10000ms
+	LogDir      string // 日志文件目录
+	CacheDir    string // 缓存文件目录
+	LogLevel    string // 日志级别 debug info warn error panic
+
+}
+
 type Kafka struct {
 	Username       string    `yaml:"username"`
 	Password       string    `yaml:"password"`

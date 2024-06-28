@@ -10,21 +10,22 @@ import (
 )
 
 var naCosConfigClient config_client.IConfigClient
+var NaCosConfig NaCosConfigStruct
 
 func InitNaCosClient() {
 	var err error
 	naCosConfigClient, err = naCosClient.CreateConfigClient(map[string]interface{}{
 		"serverConfigs": []naCosConstant.ServerConfig{{
-			IpAddr: "127.0.0.1",
-			Port:   8848,
+			IpAddr: NaCosConfig.IpAddr,
+			Port:   NaCosConfig.Port,
 		}},
 		"clientConfig": naCosConstant.ClientConfig{
-			NamespaceId:         "9db1dfc0-4ed2-4aa5-a5b5-67af919b971a",
-			TimeoutMs:           5000,
+			NamespaceId:         NaCosConfig.NamespaceId,
+			TimeoutMs:           NaCosConfig.TimeoutMs,
 			NotLoadCacheAtStart: true,
-			LogDir:              "./tmp/log",
-			CacheDir:            "./tmp/cache",
-			LogLevel:            "debug",
+			LogDir:              NaCosConfig.LogDir,
+			CacheDir:            NaCosConfig.CacheDir,
+			LogLevel:            NaCosConfig.LogLevel,
 		},
 	})
 
@@ -50,7 +51,6 @@ func GetConfig(dataId string, group string, config any) {
 		Group:  group,
 		OnChange: func(namespace, group, dataId, configContent string) {
 			UnmarshalConfig(dataId, configContent, config)
-
 		},
 	})
 }
