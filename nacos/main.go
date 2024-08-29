@@ -7,10 +7,19 @@ import (
 )
 
 func main() {
+	// NaCosConfig = NaCosConfigStruct{
+	// 	IpAddr:      "127.0.0.1",
+	// 	Port:        8848,
+	// 	NamespaceId: "9db1dfc0-4ed2-4aa5-a5b5-67af919b971a",
+	// 	TimeoutMs:   5000,
+	// 	LogDir:      "./tmp/log",
+	// 	CacheDir:    "./tmp/cache",
+	// 	LogLevel:    "debug",
+	// }
 	NaCosConfig = NaCosConfigStruct{
-		IpAddr:      "127.0.0.1",
+		IpAddr:      "http://hw-test-nacos.aidyd.com",
 		Port:        8848,
-		NamespaceId: "9db1dfc0-4ed2-4aa5-a5b5-67af919b971a",
+		NamespaceId: "a3f10455-9f7a-4e6f-bd14-95bc1aa23587",
 		TimeoutMs:   5000,
 		LogDir:      "./tmp/log",
 		CacheDir:    "./tmp/cache",
