@@ -2,7 +2,7 @@
 package main
 
 import (
-	"testGo/cobra/cmd"
+	"testGo/cobra/git/cmd"
 )
 
 func main() {
