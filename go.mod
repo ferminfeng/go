@@ -8,6 +8,7 @@ require (
 	github.com/go-zookeeper/zk v1.0.3
 	github.com/gofrs/uuid v4.4.0+incompatible
 	github.com/golang/protobuf v1.5.4
+	github.com/google/go-cmp v0.6.0
 	github.com/json-iterator/go v1.1.12
 	github.com/nacos-group/nacos-sdk-go v1.1.4
 	github.com/nats-io/nats.go v1.34.1
