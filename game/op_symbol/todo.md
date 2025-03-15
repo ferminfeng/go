@@ -1,0 +1,34 @@
+# plan functions
+- [x] add ammo to unit
+- [x] add move terrain check
+- [x] add animal of attack
+- [ ] add field view of unit
+- [ ] add status of unit
+- [ ] add endurance of unit
+- [ ] add building
+- [ ] add cars
+- [ ] reduce map size, generate better maps
+- [ ] allow direction change for unit
+- [x] allow auto attack range enemy
+- [x] commands panel
+- [x] info panel
+- [ ] map panel
+- [ ] mouse control
+- [ ] airplane only supprot attack place/sky unit, can't be hovering in a place.
+- [ ] add game background
+- [ ] add BGM
+- [ ] add start screen
+- [ ] editor of map
+- [ ] editor of unit
+- [ ] editor of campaigns
+- [ ] add more units
+- [ ] add campaigns of WWII
+- [ ] optimize the lock enemy
+- [ ] collision optimize(not use center of point check)
+- [ ] train AI for CGO
+- [ ] prepare release
+- [ ] prepare studio(2dollarStudio)
+
+# bug list
+- [ ] left click select enemy
+- [ ] commands not works, will pass to select map
