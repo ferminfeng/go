@@ -9,26 +9,30 @@ import (
 
 var startType string
 
-var KafkaAddr = []string{"localhost:9093"}
+var KafkaAddr = []string{"127.0.0.1:9092"}
 var TestTopicName = "test_topic"
 
 func main() {
 	flag.StringVar(&startType, "s", "", "启动生产者还是消费者")
 
 	flag.Parse()
-	if startType == "producer" {
+
+	switch startType {
+	case "producer":
 		producer()
-	} else if startType == "producer_new" {
+	case "producerNew":
 		producerNew()
-	} else if startType == "consumer" {
+	case "consumer":
 		consumer()
-	} else if startType == "consumer_new" {
+	case "consumerNew":
 		consumerNew()
-	} else {
+	case "moreConsumer":
+		MoreConsumer()
+	default:
 		log.Fatal("请指定启动生产者还是消费者，startType:", startType)
-		return
 	}
 
+	return
 }
 
 // Stamp2Str 时间戳 -> 字符串  1660188363 -> 2022-08-11 11:26:03

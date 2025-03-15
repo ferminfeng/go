@@ -1,7 +1,8 @@
 package main
 
 import (
-	"github.com/Shopify/sarama"
+	"fmt"
+	"github.com/IBM/sarama"
 	"log"
 	"time"
 )
@@ -25,24 +26,27 @@ func producer() {
 		}
 	}()
 
-	// 定义需要发送的消息
-	msg := &sarama.ProducerMessage{
-		Topic:     TestTopicName,
-		Key:       sarama.StringEncoder("test_kafka_key"),
-		Value:     sarama.StringEncoder("这里是kafka消息"),
-		Timestamp: time.Now(),
+	for i := 0; i < 100; i++ {
+
+		// 定义需要发送的消息
+		msg := &sarama.ProducerMessage{
+			Topic:     TestTopicName,
+			Key:       sarama.StringEncoder("test_kafka_key"),
+			Value:     sarama.StringEncoder(fmt.Sprintf("这里是kafka消息-%v", i)),
+			Timestamp: time.Now(),
+		}
+
+		log.Printf("生产者-待发送的消息：%s", string(Marshal(msg)))
+
+		// 发送消息，并获取该消息的分片、偏移量
+		partition, offset, _ := producer.SendMessage(msg)
+		if err != nil {
+			log.Fatal(err)
+			return
+		}
+
+		log.Printf("partition:%d offset:%d\n", partition, offset)
 	}
-
-	log.Printf("生产者-待发送的消息：%s", string(Marshal(msg)))
-
-	// 发送消息，并获取该消息的分片、偏移量
-	partition, offset, _ := producer.SendMessage(msg)
-	if err != nil {
-		log.Fatal(err)
-		return
-	}
-
-	log.Printf("partition:%d offset:%d\n", partition, offset)
 }
 
 func producerNew() {
