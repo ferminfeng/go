@@ -1,8 +1,9 @@
 package main
 
 import (
-	_ "github.com/hajimehoshi/ebiten/v2"
 	"log"
+
+	"github.com/hajimehoshi/ebiten/v2"
 )
 
 type Game struct{}

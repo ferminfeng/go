@@ -2,8 +2,6 @@ module testGo
 
 go 1.23
 
-replace github.com/chenzhuoyu/iasm => github.com/cloudwego/iasm v0.2.0
-
 require (
 	github.com/IBM/sarama v1.43.2
 	github.com/gin-gonic/gin v1.10.0
