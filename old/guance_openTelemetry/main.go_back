@@ -1,0 +1,303 @@
+package main
+
+import (
+	"context"
+	"fmt"
+	"go.opentelemetry.io/otel/codes"
+	"log"
+	"net/http"
+	"os"
+	"time"
+
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
+	"go.opentelemetry.io/otel/propagation"
+	"go.opentelemetry.io/otel/sdk/resource"
+	sdktrace "go.opentelemetry.io/otel/sdk/trace"
+	semconv "go.opentelemetry.io/otel/semconv/v1.7.0"
+	"go.opentelemetry.io/otel/trace"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
+
+	_ "net/http/pprof"
+)
+
+func main() {
+	shutdown := initOpenTelemetry()
+	defer func() {
+		shutdown()
+		//profiler.Stop()
+		//ddtracer.Stop()
+	}()
+
+	log.Println("connect ...")
+
+	// 性能采集
+	//profile()
+
+	// ddtrace
+	//DDTrace()
+
+	http.HandleFunc("/user", web)
+	//http.HandleFunc("/DDTraceRunApp", DDTraceRunApp)
+	//http.HandleFunc("/DDTraceRunAppWithError", DDTraceRunAppWithError)
+
+	err := http.ListenAndServe(":14317", nil)
+	if err != nil {
+		fmt.Println(fmt.Sprintf("服务启动失败: %v", err))
+	}
+
+	// 引入 _ "net/http/pprof"
+	// http://127.0.0.1:14317/debug/pprof/heap?debug=1
+
+	time.Sleep(time.Minute * 2)
+	os.Exit(0)
+}
+
+// 性能采集
+//func profile() {
+//
+//	log.Println("性能采集 start ...")
+//
+//	// push 方式
+//	err := profiler.Start(
+//		profiler.WithService("fermin-service-profiler"),
+//		profiler.WithEnv("test"),
+//		profiler.WithVersion("dd-1.0.0"),
+//		profiler.WithTags("k:1", "k:2"),
+//		profiler.WithAgentAddr("localhost:9529"), // DataKit url
+//		profiler.WithProfileTypes(
+//			profiler.CPUProfile,
+//			profiler.HeapProfile,
+//			// The profiles below are disabled by default to keep overhead
+//			// low, but can be enabled as needed.
+//
+//			// profiler.BlockProfile,
+//			// profiler.MutexProfile,
+//			// profiler.GoroutineProfile,
+//		),
+//	)
+//
+//	if err != nil {
+//		fmt.Println(fmt.Sprintf("性能采集 : %v", err))
+//	}
+//
+//	// 开启 mutex 和 block 性能采集 设置采集频率，即 1/rate 的事件被采集， 如设置为 0 或小于 0 的数值，是不进行采集的
+//	var rate = 1
+//	runtime.SetMutexProfileFraction(rate)
+//	runtime.SetBlockProfileRate(rate)
+//
+//	log.Println("性能采集 end ...")
+//}
+
+//func DDTrace() {
+//
+//	ddtracer.Start(
+//		ddtracer.WithEnv("local"),
+//		ddtracer.WithService("fermin_service_ddtrace"),
+//		//ddtracer.WithServiceVersion("1.2.3"),
+//		//ddtracer.WithGlobalTag("project", "fermin- add-ddtrace-in-golang-project"),
+//		ddtracer.WithAgentAddr("localhost:9529"), // DataKit url
+//	)
+//}
+
+//func DDTraceRunApp(w http.ResponseWriter, r *http.Request) {
+//	var err error
+//
+//	// Start a root span.
+//	span := ddtracer.StartSpan("get.data")
+//	defer span.Finish(ddtracer.WithError(err))
+//
+//	child := ddtracer.StartSpan("read.file", ddtracer.ChildOf(span.Context()))
+//	child.SetTag(ext.ResourceName, os.Args[0])
+//
+//	var bts []byte
+//	bts, err = ioutil.ReadFile(os.Args[0])
+//	span.SetTag("file_len", len(bts))
+//	child.Finish(ddtracer.WithError(err))
+//
+//	log.Printf("DDTraceRunApp Done!")
+//	w.Write([]byte("DDTraceRunApp ok"))
+//}
+
+//func DDTraceRunAppWithError(w http.ResponseWriter, r *http.Request) {
+//	var err error
+//
+//	span := ddtracer.StartSpan("init_data")
+//	fmt.Println("span.Context() : ", span.Context())
+//
+//	child := ddtracer.StartSpan("first_data", ddtracer.ChildOf(span.Context()))
+//	//child.SetTag(ext.ResourceName, "somefile-not-found.go")
+//	time.Sleep(2 * time.Second)
+//	child.Finish()
+//	fmt.Println("child.Context() : ", child.Context())
+//
+//	child2 := ddtracer.StartSpan("two_data", ddtracer.ChildOf(child.Context()))
+//	//child2.SetTag(ext.ResourceName, "somefile-not-found.go")
+//	time.Sleep(1 * time.Second)
+//	child2.Finish()
+//	fmt.Println("child2.Context() : ", child2.Context())
+//
+//	defer func() {
+//		span.Finish(ddtracer.WithError(err))
+//	}()
+//
+//	if _, err = ioutil.ReadFile("somefile-not-found.go"); err != nil {
+//		// error handle
+//	}
+//
+//	log.Printf("DDTraceRunAppWithError Done!")
+//	w.Write([]byte("DDTraceRunAppWithError ok"))
+//}
+
+// 初始化链路追踪
+func initOpenTelemetry() func() {
+	ctx := context.Background()
+
+	res, err := resource.New(ctx,
+		resource.WithAttributes(
+			semconv.ServiceNameKey.String("fermin-OpenTelemetry"),
+			semconv.DeploymentEnvironmentKey.String("test"),
+		),
+	)
+
+	if err != nil {
+		log.Fatal("【dataKit】初始化失败")
+	}
+
+	var bsp sdktrace.SpanProcessor
+
+	conn, err := grpc.DialContext(ctx, "127.0.0.1:4317", grpc.WithTransportCredentials(insecure.NewCredentials()), grpc.WithBlock())
+
+	if err != nil {
+		log.Fatal("【dataKit】failed to create gRPC connection to collector")
+	}
+
+	traceExporter, err := otlptracegrpc.New(ctx, otlptracegrpc.WithGRPCConn(conn))
+
+	if err != nil {
+		log.Fatal("【dataKit】failed to create trace exporter")
+	}
+
+	bsp = sdktrace.NewBatchSpanProcessor(traceExporter)
+
+	tracerProvider := sdktrace.NewTracerProvider(
+		sdktrace.WithSampler(sdktrace.AlwaysSample()),
+		sdktrace.WithResource(res),
+		sdktrace.WithSpanProcessor(bsp),
+	)
+
+	otel.SetTracerProvider(tracerProvider)
+
+	otel.SetTextMapPropagator(propagation.TraceContext{})
+
+	return func() {
+		err = tracerProvider.Shutdown(ctx)
+		if err != nil {
+			log.Fatal("【dataKit】failed to shutdown TracerProvider")
+		}
+	}
+}
+
+var tracer = otel.Tracer("tracer_user_login")
+
+// web handler 处理请求数据
+func web(w http.ResponseWriter, r *http.Request) {
+	_, spanA := InitBuryingPoint("demo-error-first")
+	spanA.End()
+	spanA.SetStatus(codes.Error, "span-first is error")
+
+	ctx, span := InitBuryingPoint("demo-first")
+
+	//span.SetStatus(codes.Ok, "span-first is ok")
+
+	defer span.End()
+
+	// 调用服务层
+	service(ctx)
+
+	testPoint(ctx, "aaaa")
+	testPoint(ctx, "bbbb")
+
+	_, _ = w.Write([]byte("ok"))
+	// ... 接收客户端请求
+	log.Println("finish ...")
+}
+
+func testPoint(ctx context.Context, name string) {
+	_, span := AddBuryingPoint(ctx, name)
+	defer span.End()
+}
+
+// service 调用 service 层处理业务
+func service(ctx context.Context) {
+
+	ctx, iSpan := AddBuryingPoint(ctx, "demo-service")
+	defer iSpan.End()
+
+	//iSpan.SetStatus(codes.Ok, "demo-service is ok")
+
+	testPoint(ctx, "cccc")
+	dao(ctx)
+
+	testPoint(ctx, "dddd")
+}
+
+// dao 数据访问层
+func dao(ctx context.Context) {
+	testPoint(ctx, "eeee")
+
+	ctx, iSpan := AddBuryingPoint(ctx, "demo-dao")
+	//iSpan.SetStatus(codes.Ok, "demo-dao is ok")
+
+	testPoint(ctx, "ffff")
+
+	// 创建子 span 查询数据库等操作
+	_, sqlSpan := AddBuryingPoint(ctx, "demo-sql")
+	// 成功时返回标识
+	//sqlSpan.SetStatus(codes.Ok, "demo-sql is ok")
+
+	testPoint(ctx, "gggg")
+
+	// 失败时返回标识
+	//sqlSpan.SetStatus(codes.Error, "demo-sql 失败了，来看看失败原因")
+	FinishBuryingPoint(sqlSpan, false)
+
+	defer func() {
+		//sqlSpan.End()
+
+		iSpan.End()
+	}()
+}
+
+// InitBuryingPoint 开启埋点
+func InitBuryingPoint(spanName string) (context.Context, trace.Span) {
+	commonLabels := []attribute.KeyValue{attribute.String("key1", "自定义键值对-val")}
+
+	ctx := context.Background()
+
+	ctx, span := tracer.Start(
+		ctx,
+		spanName,
+		trace.WithAttributes(commonLabels...),
+	)
+	return ctx, span
+}
+
+// AddBuryingPoint 埋点
+func AddBuryingPoint(ctx context.Context, spanName string) (context.Context, trace.Span) {
+	return tracer.Start(ctx, spanName)
+}
+
+// FinishBuryingPoint 结束埋点
+func FinishBuryingPoint(dataKitSpan trace.Span, res bool) {
+
+	dataKitSpan.End()
+
+	if res {
+		dataKitSpan.SetStatus(codes.Ok, "is ok")
+	} else {
+		dataKitSpan.SetStatus(codes.Error, "is fail")
+	}
+}
