@@ -1,8 +1,0 @@
-mode: set
-testGo/split/split.go:8.47,10.17 2 1
-testGo/split/split.go:19.2,19.19 1 1
-testGo/split/split.go:23.2,23.8 1 1
-testGo/split/split.go:10.17,12.29 2 1
-testGo/split/split.go:15.3,16.34 2 1
-testGo/split/split.go:12.29,14.4 1 1
-testGo/split/split.go:19.19,21.3 1 1
