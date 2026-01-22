@@ -10,6 +10,7 @@ require (
 	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0
 	github.com/golang/protobuf v1.5.4
 	github.com/google/go-cmp v0.6.0
+	github.com/google/wire v0.7.0
 	github.com/hajimehoshi/ebiten/v2 v2.8.6
 	github.com/json-iterator/go v1.1.12
 	github.com/nacos-group/nacos-sdk-go v1.1.4
